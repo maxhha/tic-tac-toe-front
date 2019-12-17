@@ -1,5 +1,6 @@
 import React from 'react'
 import Login from "pages/Login"
+import Room from "pages/Room"
 
 import {
   HashRouter as Router,
@@ -12,6 +13,7 @@ const App: React.FC = () => {
     <Router>
       <Switch>
         <Route exact path="/" component={Login} />
+        <Route path="/:id" component={Room} />
       </Switch>
     </Router>
   )

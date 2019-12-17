@@ -4,25 +4,15 @@ import { graphql } from 'babel-plugin-relay/macro'
 import styled from "styled-components"
 
 import {
+  Page,
+  Input,
+  Button,
+} from "styles"
+
+import {
   commitMutation,
   setAuthorizationToken,
 } from "utils"
-
-const Page = styled.div`
-  width: 100vw;
-  height: 100vh;
-`
-
-const Button = styled.button`
-  display: inline-block;
-  padding: 0.5rem;
-  font-family: monospace;
-`
-
-const Input = styled.input`
-  padding: 0.5rem;
-  font-family: monospace;
-`
 
 const LoginFormInner = styled.div`
   display: flex;
