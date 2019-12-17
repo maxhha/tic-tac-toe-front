@@ -1,4 +1,5 @@
 import React from "react"
+import { withRouter, RouteComponentProps } from "react-router-dom"
 import { graphql } from 'babel-plugin-relay/macro'
 import styled from "styled-components"
 
@@ -59,7 +60,7 @@ const createRoomMutation = graphql`
   }
 `
 
-export const Login: React.FC = () => {
+const Login: React.FC<RouteComponentProps> = ({ history }) => {
   const userName = React.createRef<HTMLInputElement>()
   const roomName = React.createRef<HTMLInputElement>()
   const [busy, setBusy] = React.useState<boolean>(false)
@@ -95,7 +96,7 @@ export const Login: React.FC = () => {
         console.error(result.errors)
 
       if (result.responce) {
-        console.log(result.responce.createRoom)
+        history.push("/"+result.responce.createRoom.id)
       }
       setBusy(false)
     })
@@ -104,11 +105,13 @@ export const Login: React.FC = () => {
     <Page>
       <LoginForm>
         <LoginFormInner>
-          <Input placeholder="User name" ref={userName} />
-          <Input placeholder="Room name" ref={roomName} />
-          <Button onClick={handleClick} disabled={busy}>Create room</Button>
+          <Input placeholder= "User name" ref = { userName } />
+          <Input placeholder="Room name" ref = { roomName } />
+          <Button onClick={ handleClick } disabled = { busy } > Create room </Button>
         </LoginFormInner>
       </LoginForm>
     </Page>
   )
 }
+
+export default withRouter(Login)
