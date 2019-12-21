@@ -16,6 +16,8 @@
     "@types/react-router": "^5.1.3",
     "@types/react-router-dom": "^5.1.3",
     "@types/styled-components": "^4.4.1",
+    "apollo-link": "^1.2.13",
+    "apollo-link-ws": "^1.0.19",
     "babel-plugin-macros": "^2.8.0",
     "dotenv": "^8.2.0",
     "graphql": "^14.5.8",
@@ -27,6 +29,7 @@
     "react-scripts": "3.3.0",
     "relay-compiler": "^7.1.0",
     "styled-components": "^4.4.1",
+    "subscriptions-transport-ws": "^0.9.16",
     "typescript": "~3.7.2",
     "watchman": "^1.0.0"
   },

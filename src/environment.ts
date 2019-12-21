@@ -1,3 +1,5 @@
+import { execute, DocumentNode } from 'apollo-link'
+import { WebSocketLink } from 'apollo-link-ws'
 import {
   Environment,
   Network,
@@ -8,6 +10,23 @@ import {
 } from 'relay-runtime';
 
 import { getAuthorizationToken } from "utils"
+
+const subscribtionUri = process.env.REACT_APP_SUBSCRIPTIONS_URL || 'ws://localhost:4000/graphql';
+
+const subscriptionLink = new WebSocketLink({
+  uri: subscribtionUri,
+  options: {
+    lazy: true,
+    reconnect: true,
+    connectionParams: () => Promise.resolve({ authorization: getAuthorizationToken() }),
+  }
+})
+
+const networkSubscriptions: any = (operation: {text: DocumentNode}, variables: Variables) =>
+  execute(subscriptionLink, {
+    query: operation.text,
+    variables,
+  })
 
 const fetchQuery = async (
   operation: RequestParameters,
@@ -28,7 +47,7 @@ const fetchQuery = async (
   })
 }
 
-const network = Network.create(fetchQuery);
+const network = Network.create(fetchQuery, networkSubscriptions);
 const store = new Store(new RecordSource())
 
 const environment = new Environment({
