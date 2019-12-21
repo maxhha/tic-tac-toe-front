@@ -1,49 +1,40 @@
+import idx from "idx"
 import React from "react"
-import styled from "styled-components"
 import { withRouter, RouteComponentProps } from "react-router-dom"
 import { graphql } from 'babel-plugin-relay/macro'
 
 import {
-  requestSubscription,
-} from "utils"
+  QueryRenderer
+} from "components"
 
-import {
-  Page,
-} from "styles"
+import WaitRoom from "./Wait"
 
-const Label = styled.h2`
-  margin: 4rem auto;
-  font-family: monospace;
-  text-align: center;
-  font-weight: 400;
-`
-
-const subscription = graphql`
-  subscription RoomWaitPlayerSubscription {
-    waitForOtherUserEnter {
-      gameActive
+const query = graphql`
+  query RoomUserQuery {
+    viewer {
+      name
+      currentRoom {
+        id
+        name
+        gameActive
+      }
     }
   }
 `
 
-
-const Room: React.FC<RouteComponentProps> = ({ history }) => {
-  console.log("start listen")
-  React.useEffect(() => {
-    requestSubscription(
-      subscription,
-      {},
-      ({responce, dispose}) => {
-        console.log(responce)
-        console.log(dispose)
-      }
-    ).then((data) => console.log(data))
-  }, [])
-  return (
-    <Page>
-      <Label>Waiting for other player</Label>
-    </Page>
-  )
-}
+const Room: React.FC<RouteComponentProps<{id: string}>> = (props) => (
+  <QueryRenderer
+    query={query}
+    render={({ viewer }) => (
+      viewer
+        ? props.match.params.id === idx(viewer, _=>_.currentRoom.id)
+          ? <WaitRoom />
+          : idx(viewer, _=>_.currentRoom.gameActive)
+            ? "Игрок находится в другой комнате"
+            : "Игрок может зайти в комнату"
+        : "Игроку нужно зарегаться перед тем как зайти в комнату"
+    )}
+  />
+)
 
 export default withRouter(Room)

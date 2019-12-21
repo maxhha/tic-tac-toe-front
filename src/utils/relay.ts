@@ -1,4 +1,5 @@
 import {
+  fetchQuery as relayFetchQuery,
   commitMutation as relayCommitMutation,
   requestSubscription  as relayRequestSubscription,
   Variables,
@@ -7,17 +8,32 @@ import {
 import { PayloadError, Disposable } from "relay-runtime"
 import environment from "environment"
 
+export const fetchQuery = ({
+  query,
+  variables,
+}: {
+  query: GraphQLTaggedNode,
+  variables?: Variables,
+}) => relayFetchQuery<any>(
+  environment,
+  query,
+  variables,
+)
+
 type onCompleted = { responce?: any, errors?: ReadonlyArray<PayloadError> | null }
 
-export const commitMutation = (
+export const commitMutation = ({
+  mutation,
+  variables,
+}:{
   mutation: GraphQLTaggedNode,
-  variables: Variables,
-) => new Promise<onCompleted>((resolve, reject) => {
+  variables?: Variables,
+}) => new Promise<onCompleted>((resolve, reject) => {
     relayCommitMutation(
       environment,
       {
         mutation,
-        variables,
+        variables: variables || {},
         onCompleted: (responce, errors) => resolve({ responce, errors }),
         onError: reject,
       },
@@ -25,20 +41,25 @@ export const commitMutation = (
   }
 )
 
-export const requestSubscription = (
+export const requestSubscription = ({
+  subscription,
+  variables,
+  onCompleted,
+  onNext,
+  onError,
+}: {
   subscription: GraphQLTaggedNode,
-  variables: Variables,
-  onNext?: (props: {responce: any, dispose: () => void }) => void,
-) => new Promise<any>((resolve, reject) => {
-    const sub: Disposable = relayRequestSubscription(
-      environment,
-      {
-        subscription,
-        variables,
-        onCompleted: resolve,
-        onError: reject,
-        onNext: (responce: any) => onNext && onNext({responce, dispose: sub.dispose}),
-      }
-    )
+  variables?: Variables,
+  onCompleted?: () => void,
+  onNext?: (response: any) => void,
+  onError?: (error: Error) => void,
+}) => relayRequestSubscription(
+  environment,
+  {
+    subscription,
+    variables: variables || {},
+    onCompleted,
+    onError,
+    onNext,
   }
 )

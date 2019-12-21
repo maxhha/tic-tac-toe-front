@@ -13,6 +13,7 @@ const App: React.FC = () => {
     <Router>
       <Switch>
         <Route exact path="/" component={Login} />
+        <Route path="/game" render={() => <h2>In Game</h2>} />
         <Route path="/:id" component={Room} />
       </Switch>
     </Router>

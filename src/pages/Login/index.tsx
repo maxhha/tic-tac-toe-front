@@ -59,22 +59,20 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
       return
     const input = { name: userName.current.value }
     const name = roomName.current.value
-    commitMutation(
-      createUserMutaion,
-      {
-        input,
-      },
-    ).then(
+    commitMutation({
+      mutation: createUserMutaion,
+      variables: { input },
+    }).then(
       ({ responce, errors }) => {
         if (errors)
           console.error(errors)
 
         if (responce) {
           setAuthorizationToken(responce.createUser)
-          return commitMutation(
-            createRoomMutation,
-            { name },
-          )
+          return commitMutation({
+            mutation: createRoomMutation,
+            variables: { name },
+          })
         } else {
           setBusy(false)
           return null
