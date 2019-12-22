@@ -7,7 +7,6 @@ import {
 } from "components"
 
 import Wait from "./Wait"
-import Register from "./Register"
 
 import {
   Page,
@@ -67,7 +66,7 @@ const Room: React.FC<Props> = ({ viewer, getRoom: room}) => {
     } else if (viewer){
       return <>Игрок может зайти в комнату</>
     } else {
-      return <Register room={room}/>
+      return <Redirect to={`/register/${room.id}`}/>
     }
   } else {
     return <NotFound />
@@ -90,7 +89,6 @@ export default withRouter((
     ) => {
       if (viewer && viewer.currentRoom) {
         if (viewer.currentRoom.id === props.match.params.id) {
-          console.log(viewer)
           if (viewer.currentRoom.gameActive) {
             return <Redirect to="/game" />
           } else {
