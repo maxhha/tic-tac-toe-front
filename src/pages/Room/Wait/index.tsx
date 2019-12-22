@@ -1,5 +1,4 @@
 import React from "react"
-import styled from "styled-components"
 import { withRouter, RouteComponentProps } from "react-router-dom"
 import { graphql } from 'babel-plugin-relay/macro'
 
@@ -9,17 +8,11 @@ import {
 
 import {
   Page,
+  Heading,
 } from "styles"
 
-const Label = styled.h2`
-  margin: 4rem auto;
-  font-family: monospace;
-  text-align: center;
-  font-weight: 400;
-`
-
 const subscription = graphql`
-  subscription RoomWaitPlayerSubscription {
+  subscription WaitPlayerSubscription {
     waitForOtherUserEnter {
       gameActive
     }
@@ -40,7 +33,7 @@ const WaitRoom: React.FC<RouteComponentProps> = ({ history }) => {
   }, [])
   return (
     <Page>
-      <Label>Waiting for other player</Label>
+      <Heading.h2>Waiting for other player</Heading.h2>
     </Page>
   )
 }

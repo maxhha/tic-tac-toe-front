@@ -1,44 +1,20 @@
 import React from "react"
 import { withRouter, RouteComponentProps } from "react-router-dom"
 import { graphql } from 'babel-plugin-relay/macro'
-import styled from "styled-components"
 
 import {
   Page,
   Input,
   Button,
+  LoginForm,
 } from "styles"
+
+import commitCreateUserMutation from "mutations/createUser"
 
 import {
   commitMutation,
   setAuthorizationToken,
 } from "utils"
-
-const LoginFormInner = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
-  * {
-    margin: 0.5rem;
-  }
-`
-
-const LoginForm = styled.div`
-  padding: 12rem;
-  & ${LoginFormInner} {
-    margin: auto;
-    max-width: 720px;
-  }
-`
-
-const createUserMutaion = graphql`
-  mutation LoginCreateUserMutation(
-    $input: createUserInput!
-  ) {
-    createUser(input: $input)
-  }
-`
 
 const createRoomMutation = graphql`
   mutation LoginCreateRoomMutation(
@@ -55,26 +31,31 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
   const roomName = React.createRef<HTMLInputElement>()
   const [busy, setBusy] = React.useState<boolean>(false)
   const handleClick = () => {
-    if (!userName.current || !roomName.current)
+    if (
+      !userName.current
+      || !roomName.current
+      || userName.current.value === ""
+      || roomName.current.value === ""
+    )
       return
-    const input = { name: userName.current.value }
+
     const name = roomName.current.value
-    commitMutation({
-      mutation: createUserMutaion,
-      variables: { input },
+    commitCreateUserMutation({
+      name: userName.current.value,
     }).then(
-      ({ responce, errors }) => {
+      ({ response, errors }) => {
         if (errors)
           console.error(errors)
 
-        if (responce) {
-          setAuthorizationToken(responce.createUser)
+        if (response && response.createUser) {
+          setAuthorizationToken(response.createUser)
           return commitMutation({
             mutation: createRoomMutation,
             variables: { name },
           })
         } else {
           setBusy(false)
+          console.error(errors)
           return null
         }
       }
@@ -83,8 +64,8 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
       if (result.errors)
         console.error(result.errors)
 
-      if (result.responce) {
-        history.push("/"+result.responce.createRoom.id)
+      if (result.response) {
+        history.push("/"+result.response.createRoom.id)
       }
       setBusy(false)
     })
@@ -92,11 +73,9 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
   return (
     <Page>
       <LoginForm>
-        <LoginFormInner>
-          <Input placeholder= "User name" ref = { userName } />
-          <Input placeholder="Room name" ref = { roomName } />
-          <Button onClick={ handleClick } disabled = { busy } > Create room </Button>
-        </LoginFormInner>
+        <Input placeholder= "User name" ref = { userName } />
+        <Input placeholder="Room name" ref = { roomName } />
+        <Button onClick={ handleClick } disabled = { busy } > Create room </Button>
       </LoginForm>
     </Page>
   )
