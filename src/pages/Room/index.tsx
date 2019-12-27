@@ -1,6 +1,10 @@
 import React from "react"
-import { withRouter, RouteComponentProps, Redirect } from "react-router-dom"
 import { graphql } from 'babel-plugin-relay/macro'
+import {
+  withRouter,
+  RouteComponentProps,
+  Redirect,
+} from "react-router-dom"
 
 import {
   QueryRenderer
@@ -59,12 +63,20 @@ const RoomIsActive: React.FC<{room: Room}> = ({ room }) => (
   </Page>
 )
 
+const CantEnter: React.FC = () => (
+  <Page>
+    <Heading.h2>
+      User doesnt finish last game
+    </Heading.h2>
+  </Page>
+)
+
 const Room: React.FC<Props> = ({ viewer, getRoom: room}) => {
   if (room) {
     if (room.gameActive){
       return <RoomIsActive room={room}/>
     } else if (viewer){
-      return <>Игрок может зайти в комнату</>
+      return <CantEnter />
     } else {
       return <Redirect to={`/register/${room.id}`}/>
     }
