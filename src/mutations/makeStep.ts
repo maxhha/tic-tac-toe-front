@@ -4,7 +4,7 @@ import {
 } from "utils"
 
 const mutation = graphql`
-  mutation GameMakeStepMutation(
+  mutation makeStepMutation(
     $input: makeStepInput!
   ) {
     makeStep(input: $input) {

@@ -50,6 +50,11 @@ interface GameBoardProps {
   viewer: QueryViewer,
 }
 
+interface Position {
+  x: number,
+  y: number,
+}
+
 interface GameBoardState {
   selected: Position | null,
   busy: boolean,
