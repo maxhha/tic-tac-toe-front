@@ -9,6 +9,7 @@ import {
 import {
   Field,
   FieldCell,
+  FieldStep,
 } from "./elements"
 
 const query = graphql`
@@ -22,6 +23,10 @@ const query = graphql`
         owner {
           id
         }
+      }
+      possibleSteps {
+        x
+        y
       }
       lastStep {
         position {
@@ -63,6 +68,7 @@ interface Cell {
 
 interface Board {
   cells: Cell[],
+  possibleSteps: Position[],
   lastStep: Cell | null,
   order: User[],
   winner: User<string> | null,
@@ -73,6 +79,8 @@ interface BoardState {
   board: Board | null,
   offset: Position,
   size: Position,
+  selected: Position | null,
+  symbols: { [key: string]: string },
 }
 
 const updateBounds = ({x, y}: Position, state: BoardState) => {
@@ -107,6 +115,8 @@ const Board: React.FC = () => {
     board: null,
     offset: { x: -1, y: -1 },
     size: { x: 3, y: 3 },
+    selected: null,
+    symbols: {}
   })
 
   const {
@@ -122,6 +132,15 @@ const Board: React.FC = () => {
           setState({
             ...state,
             board: data.board,
+            symbols: data.board.order.reduce(
+              (store, { id }, index) => (
+                {
+                  ...store,
+                  [id]: index === 0 ? "o" : "x",
+                }
+              ),
+              {},
+            ),
           })
         } else {
           throw new Error("Board is null")
@@ -137,21 +156,38 @@ const Board: React.FC = () => {
       >
         <Field
           style={{
-            gridTemplateColumns: `repeat(${3 + 2}, 4rem)`,
-            gridTemplateRows: `repeat(${3 + 2}, 4rem)`,
+            gridTemplateColumns: `repeat(${size.x + 2}, 4rem)`,
+            gridTemplateRows: `repeat(${size.y + 2}, 4rem)`,
             transform: `translate(${4*offset.x + 2*(size.x - 1)}rem, ${4*offset.y + 2*(size.y - 1)}rem)`,
           }}
         >
           {board.cells.map(({ position: { x, y }, owner: { id } }) => (
             <FieldCell
-              key={`${x};${y}`}
+              key={`${x};${y}:${id}`}
               style={{
                 gridColumn: x - offset.x + 2, /* grid starts from 1*/
                 gridRow: y - offset.y + 2, /*and add offset for step*/
               }}
             >
-              {id === board.order[1].id ? "x" : "o"}
+              {state.symbols[id]}
             </FieldCell>
+          ))}
+          {board.possibleSteps.map(({x, y}) => (
+            <FieldStep
+              key={`${x};${y}`}
+              style={{
+                gridColumn: x - offset.x + 2, /* grid starts from 1*/
+                gridRow: y - offset.y + 2, /*and add offset for step*/
+              }}
+              onClick={() => setState({ ...state, selected: { x, y } }) }
+              children={
+                state.selected !== null
+                && x === state.selected.x
+                && y === state.selected.y
+                && board.currentPlayer
+                && state.symbols[board.currentPlayer.id]
+              }
+            />
           ))}
         </Field>
       </MapInteractionCSS>
