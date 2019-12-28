@@ -3,7 +3,8 @@ import { graphql } from "babel-plugin-relay/macro"
 import { MapInteractionCSS } from "react-map-interaction"
 
 import {
-  fetchQuery
+  fetchQuery,
+  requestSubscription,
 } from "utils"
 
 import {
@@ -75,6 +76,40 @@ interface Board {
   currentPlayer: User | null,
 }
 
+const subscription = graphql`
+  subscription BoardChangeSubscription {
+    waitBoardChange {
+      lastStep {
+        position {
+          x
+          y
+        }
+        owner {
+          id
+        }
+      }
+      possibleSteps {
+        x
+        y
+      }
+      currentPlayer {
+        id
+      }
+      winner {
+        id
+        name
+      }
+    }
+  }
+`
+
+interface BoardFromSubscription {
+  lastStep: Cell | null,
+  possibleSteps: Position[],
+  winner: User<string> | null,
+  currentPlayer: User | null,
+}
+
 interface BoardState {
   board: Board | null,
   offset: Position,
@@ -88,7 +123,14 @@ interface BoardProps {
   onSelect(position: Position): void,
 }
 
-const updateBounds = ({x, y}: Position, state: BoardState) => {
+const updateBounds = (state: BoardState): BoardState => {
+    if (
+      !state.board
+      || !state.board.lastStep
+    ) {
+      return state
+    }
+    const { x, y } = state.board.lastStep.position
     let {
       offset: { x: xOffset, y: yOffset },
       size: {x: width, y: height }
@@ -115,6 +157,23 @@ const updateBounds = ({x, y}: Position, state: BoardState) => {
     }
 }
 
+const getOffsetAndSize = ({
+  min,
+  max,
+}: {
+  min: Position,
+  max: Position,
+}): {
+  offset: Position,
+  size: Position,
+} => ({
+  offset: min,
+  size: {
+    x: max.x - min.x + 1,
+    y: max.y - min.y + 1,
+  },
+})
+
 const Board: React.FC<BoardProps> = ({ viewer, selected, onSelect }) => {
   const [state, setState] = React.useState<BoardState>({
     board: null,
@@ -131,12 +190,27 @@ const Board: React.FC<BoardProps> = ({ viewer, selected, onSelect }) => {
 
   React.useEffect(() => {
     fetchQuery({ query })
-      .then((data: { board: Board | null}) => {
-        if (data.board) {
-          setState({
+      .then(({ board }: { board: Board | null}) => {
+        if (board) {
+          setState((state) => ({
             ...state,
-            board: data.board,
-            symbols: data.board.order.reduce(
+            ...getOffsetAndSize(
+              board.possibleSteps.reduce(({ min, max }, { x, y }) => ({
+                min: {
+                  x: Math.min(x, min.x),
+                  y: Math.min(y, min.y),
+                },
+                max: {
+                  x: Math.max(x, max.x),
+                  y: Math.max(y, max.y),
+                },
+              }), {
+                min: { x: 0, y: 0},
+                max: { x: 0, y: 0},
+              })
+            ),
+            board: board,
+            symbols: board.order.reduce(
               (store, { id }, index) => (
                 {
                   ...store,
@@ -145,11 +219,46 @@ const Board: React.FC<BoardProps> = ({ viewer, selected, onSelect }) => {
               ),
               {},
             ),
-          })
+          }))
         } else {
           throw new Error("Board is null")
         }
-      })
+      }).catch(
+        (err) => console.error(err)
+      )
+    const { dispose } = requestSubscription(
+      {
+        subscription,
+        onNext: ({
+          waitBoardChange: boardChange,
+        }: {
+          waitBoardChange: BoardFromSubscription | null
+        }) => {
+          if (boardChange) {
+            setState((state) => (
+              state.board
+              ? updateBounds({
+                ...state,
+                board: {
+                  ...state.board,
+                  ...boardChange,
+                  cells: (
+                    boardChange.lastStep
+                    ? state.board.cells.concat(boardChange.lastStep)
+                    : state.board.cells
+                  ),
+                },
+              })
+              :
+              state
+            ))
+          } else {
+            dispose()
+            throw new Error("Board is null")
+          }
+        },
+      }
+    )
   }, [])
 
   return (
@@ -186,7 +295,14 @@ const Board: React.FC<BoardProps> = ({ viewer, selected, onSelect }) => {
                   gridColumn: x - offset.x + 2, /* grid starts from 1*/
                   gridRow: y - offset.y + 2, /*and add offset for step*/
                 }}
-                onClick={() => onSelect({ x, y }) }
+                onClick={(e) => {
+                    onSelect({ x, y })
+                    e.stopPropagation()
+                }}
+                onTouchEnd={(e) => {
+                    onSelect({ x, y })
+                    e.stopPropagation()
+                }}
                 children={
                   selected !== null
                   && x === selected.x

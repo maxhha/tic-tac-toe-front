@@ -7,6 +7,7 @@ export const FieldCell = styled.div`
   width: calc(100% + 2px);
   height: calc(100% + 2px);
   border: 2px solid gray;
+  line-height: 4rem;
 `
 
 export const FieldStep = styled(FieldCell)`
@@ -16,17 +17,14 @@ export const FieldStep = styled(FieldCell)`
   cursor: pointer;
 
   font-family: monospace;
-  color: rgba(0,0,0,0);
-  font-size: 3.25rem;
+  color: rgba(0,0,0,0.6);
   text-align: center;
-  line-height: 1;
 
   &:hover {
       background-color: #BFB;
   }
   ${props => props.children && (
-    "color: rgba(0,0,0,0.6);"
-    + "background-color: #BFB;"
+    "background-color: #BFB;"
   )}
   }
 `
@@ -44,5 +42,4 @@ export const Field = styled.div`
   color: #222;
   font-size: 4rem;
   text-align: center;
-  line-height: 3.5rem;
 `
