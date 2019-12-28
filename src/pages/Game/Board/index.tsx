@@ -79,12 +79,13 @@ interface BoardState {
   board: Board | null,
   offset: Position,
   size: Position,
-  selected: Position | null,
   symbols: { [key: string]: string },
 }
 
 interface BoardProps {
   viewer: { id: string },
+  selected: Position | null,
+  onSelect(position: Position): void,
 }
 
 const updateBounds = ({x, y}: Position, state: BoardState) => {
@@ -114,13 +115,12 @@ const updateBounds = ({x, y}: Position, state: BoardState) => {
     }
 }
 
-const Board: React.FC<BoardProps> = ({ viewer }) => {
+const Board: React.FC<BoardProps> = ({ viewer, selected, onSelect }) => {
   const [state, setState] = React.useState<BoardState>({
     board: null,
     offset: { x: -1, y: -1 },
     size: { x: 3, y: 3 },
-    selected: null,
-    symbols: {}
+    symbols: {},
   })
 
   const {
@@ -186,11 +186,11 @@ const Board: React.FC<BoardProps> = ({ viewer }) => {
                   gridColumn: x - offset.x + 2, /* grid starts from 1*/
                   gridRow: y - offset.y + 2, /*and add offset for step*/
                 }}
-                onClick={() => setState({ ...state, selected: { x, y } }) }
+                onClick={() => onSelect({ x, y }) }
                 children={
-                  state.selected !== null
-                  && x === state.selected.x
-                  && y === state.selected.y
+                  selected !== null
+                  && x === selected.x
+                  && y === selected.y
                   && state.symbols[viewer.id]
                 }
               />
