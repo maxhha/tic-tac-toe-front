@@ -83,6 +83,10 @@ interface BoardState {
   symbols: { [key: string]: string },
 }
 
+interface BoardProps {
+  viewer: { id: string },
+}
+
 const updateBounds = ({x, y}: Position, state: BoardState) => {
     let {
       offset: { x: xOffset, y: yOffset },
@@ -110,7 +114,7 @@ const updateBounds = ({x, y}: Position, state: BoardState) => {
     }
 }
 
-const Board: React.FC = () => {
+const Board: React.FC<BoardProps> = ({ viewer }) => {
   const [state, setState] = React.useState<BoardState>({
     board: null,
     offset: { x: -1, y: -1 },
@@ -172,23 +176,26 @@ const Board: React.FC = () => {
               {state.symbols[id]}
             </FieldCell>
           ))}
-          {board.possibleSteps.map(({x, y}) => (
-            <FieldStep
-              key={`${x};${y}`}
-              style={{
-                gridColumn: x - offset.x + 2, /* grid starts from 1*/
-                gridRow: y - offset.y + 2, /*and add offset for step*/
-              }}
-              onClick={() => setState({ ...state, selected: { x, y } }) }
-              children={
-                state.selected !== null
-                && x === state.selected.x
-                && y === state.selected.y
-                && board.currentPlayer
-                && state.symbols[board.currentPlayer.id]
-              }
-            />
-          ))}
+          {
+            board.currentPlayer
+            && board.currentPlayer.id === viewer.id
+            && board.possibleSteps.map(({x, y}) => (
+              <FieldStep
+                key={`${x};${y}`}
+                style={{
+                  gridColumn: x - offset.x + 2, /* grid starts from 1*/
+                  gridRow: y - offset.y + 2, /*and add offset for step*/
+                }}
+                onClick={() => setState({ ...state, selected: { x, y } }) }
+                children={
+                  state.selected !== null
+                  && x === state.selected.x
+                  && y === state.selected.y
+                  && state.symbols[viewer.id]
+                }
+              />
+            ))
+          }
         </Field>
       </MapInteractionCSS>
     ) : (
