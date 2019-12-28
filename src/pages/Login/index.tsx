@@ -30,7 +30,8 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
   const userName = React.createRef<HTMLInputElement>()
   const roomName = React.createRef<HTMLInputElement>()
   const [busy, setBusy] = React.useState<boolean>(false)
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault()
     if (
       !userName.current
       || !roomName.current
@@ -66,8 +67,9 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
 
       if (result.response) {
         history.push("/"+result.response.createRoom.id)
+      } else {
+        setBusy(false)
       }
-      setBusy(false)
     })
   }
   return (
