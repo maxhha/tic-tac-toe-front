@@ -57,11 +57,6 @@ interface User<Name = undefined> {
   name: Name,
 }
 
-interface Position {
-  x: number,
-  y: number,
-}
-
 interface Cell {
   position: Position,
   owner: User,

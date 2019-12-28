@@ -1,14 +1,11 @@
 import React from "react"
-import styled from "styled-components"
 import { graphql } from "babel-plugin-relay/macro"
 
 import {
   Redirect,
 } from "react-router-dom"
 
-import {
-  commitMutation,
-} from "utils"
+import makeStepMutation from "mutations/makeStep"
 
 import {
   QueryRenderer,
@@ -21,29 +18,9 @@ import {
 
 import Board from "./Board"
 
-const ControlButton = styled.button`
-  position: fixed;
-  top: 100%;
-  left: 50%;
-  padding: 1rem 4rem;
-
-  background-color: #CEC;
-  outline: none;
-  border-radius: 0.5rem;
-
-  font-family: monospace;
-  color: black;
-  font-size: 2rem;
-
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.3;
-    cursor: default;
-  }
-
-  transform: translate(-50%, -100%) translateY(-2rem);
-`
+import {
+  ControlButton,
+} from "./elements"
 
 const query = graphql`
   query GameQuery {
@@ -68,30 +45,9 @@ interface QueryViewer {
   id: string,
 }
 
-const makeStepMutation = graphql`
-  mutation GameMakeStepMutation(
-    $input: makeStepInput!
-  ) {
-    makeStep(input: $input) {
-      currentPlayer {
-        id
-      }
-    }
-  }
-`
-
-interface MutationBoard {
-  currentPlayer: { id: string } | null,
-}
-
 interface GameBoardProps {
   board: QueryBoard,
   viewer: QueryViewer,
-}
-
-interface Position {
-  x: number,
-  y: number,
 }
 
 interface GameBoardState {
@@ -112,17 +68,8 @@ const GameBoard: React.FC<GameBoardProps> = (props) => {
 
   const makeStep = (position: Position) => {
     setState({...state, busy: true})
-    commitMutation<{
-      makeStep: MutationBoard | null,
-    }>(
-      {
-        mutation: makeStepMutation,
-        variables: {
-          input: {
-            ...position,
-          }
-        }
-      }
+    makeStepMutation(
+      position,
     ).then(
       ({ response, errors}) => {
         if (errors) {
@@ -167,7 +114,7 @@ const GameBoard: React.FC<GameBoardProps> = (props) => {
   )
 }
 
-const GamePage = () => (
+const GamePage: React.FC = () => (
   <Page>
     <QueryRenderer
       query={query}
