@@ -1,6 +1,10 @@
 import styled from "styled-components"
 
-export const FieldCell = styled.div`
+interface FieldCellProps {
+  lastStep?: boolean,
+}
+
+export const FieldCell = styled.div<FieldCellProps>`
   position: relative;
   top: 1px;
   left: 1px;
@@ -8,6 +12,10 @@ export const FieldCell = styled.div`
   height: calc(100% + 2px);
   border: 2px solid gray;
   line-height: 4rem;
+  ${props =>
+    props.lastStep
+    && "background-color: #FF3;"
+  }
 `
 
 export const FieldStep = styled(FieldCell)`
