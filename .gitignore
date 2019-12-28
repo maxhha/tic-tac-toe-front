@@ -19,7 +19,7 @@
 .env.test.local
 .env.production.local
 
-**/__generated__/*
+**/__*__
 schema/
 
 npm-debug.log*
