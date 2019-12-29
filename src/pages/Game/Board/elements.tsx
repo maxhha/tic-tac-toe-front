@@ -1,7 +1,7 @@
 import styled from "styled-components"
 
 interface FieldCellProps {
-  lastStep?: boolean,
+  highlight?: boolean,
 }
 
 export const FieldCell = styled.div<FieldCellProps>`
@@ -13,7 +13,7 @@ export const FieldCell = styled.div<FieldCellProps>`
   border: 2px solid gray;
   line-height: 4rem;
   ${props =>
-    props.lastStep
+    props.highlight
     && "background-color: #FF3;"
   }
 `

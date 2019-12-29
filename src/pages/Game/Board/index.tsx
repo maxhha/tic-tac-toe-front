@@ -45,6 +45,10 @@ const query = graphql`
         id
         name
       }
+      winnerLine {
+        x
+        y
+      }
       currentPlayer {
         id
       }
@@ -73,6 +77,7 @@ interface Board {
   lastStep: Cell | null,
   order: User[],
   winner: User<string> | null,
+  winnerLine: Position[] | null,
   currentPlayer: User | null,
 }
 
@@ -99,6 +104,10 @@ const subscription = graphql`
         id
         name
       }
+      winnerLine {
+        x
+        y
+      }
     }
   }
 `
@@ -107,6 +116,7 @@ interface BoardFromSubscription {
   lastStep: Cell | null,
   possibleSteps: Position[],
   winner: User<string> | null,
+  winnerLine: Position[] | null,
   currentPlayer: User | null,
 }
 
@@ -276,10 +286,17 @@ const Board: React.FC<BoardProps> = ({ viewer, selected, onSelect }) => {
                 gridColumn: x - offset.x + 2, /* grid starts from 1*/
                 gridRow: y - offset.y + 2, /*and add offset for step*/
               }}
-              lastStep={
-                board.lastStep !== null
-                && x === board.lastStep.position.x
-                && y === board.lastStep.position.y
+              highlight={
+                (
+                  board.lastStep !== null
+                  && x === board.lastStep.position.x
+                  && y === board.lastStep.position.y
+                ) || (
+                  board.winnerLine !== null
+                  && board.winnerLine.findIndex(
+                    p => p.x === x && p.y === y
+                  ) >= 0
+                )
               }
             >
               {state.symbols[id]}

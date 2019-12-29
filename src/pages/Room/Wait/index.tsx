@@ -53,7 +53,8 @@ const WaitRoom: React.FC<RouteComponentProps> = ({ history }) => {
         }
       },
     })
-  }, [])
+    return dispose
+  }, [history])
   return (
     <Page>
       <Heading.h2>Waiting for other player</Heading.h2>
