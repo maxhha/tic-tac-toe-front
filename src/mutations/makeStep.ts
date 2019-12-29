@@ -24,4 +24,4 @@ export default (position: {
       id: string,
     } | null,
   } | null,
-}>({ mutation, variables: position })
+}>({ mutation, variables: { input: position } })

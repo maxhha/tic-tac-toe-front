@@ -9,6 +9,8 @@ export const Page = styled.div`
 export const Heading = () => null
 
 Heading.h2 = styled.h2`
+  display: inline-block;
+  width: 100%;
   margin: 4rem auto;
   font-family: monospace;
   text-align: center;
