@@ -157,22 +157,35 @@ const updateBounds = (state: BoardState): BoardState => {
     }
 }
 
-const getOffsetAndSize = ({
-  min,
-  max,
-}: {
-  min: Position,
-  max: Position,
-}): {
+const getOffsetAndSize = (
+  positions: Position[],
+): {
   offset: Position,
   size: Position,
-} => ({
-  offset: min,
-  size: {
-    x: max.x - min.x + 1,
-    y: max.y - min.y + 1,
-  },
-})
+} => {
+  const { min, max } = positions.reduce(
+    ({ min, max }, { x, y }) => ({
+      min: {
+        x: Math.min(x, min.x),
+        y: Math.min(y, min.y),
+      },
+      max: {
+        x: Math.max(x, max.x),
+        y: Math.max(y, max.y),
+      },
+    }), {
+      min: { x: 0, y: 0},
+      max: { x: 0, y: 0},
+    }
+  )
+  return {
+    offset: min,
+    size: {
+      x: max.x - min.x + 1,
+      y: max.y - min.y + 1,
+    },
+  }
+}
 
 const Board: React.FC<BoardProps> = ({ viewer, selected, onSelect }) => {
   const [state, setState] = React.useState<BoardState>({
@@ -190,25 +203,11 @@ const Board: React.FC<BoardProps> = ({ viewer, selected, onSelect }) => {
 
   React.useEffect(() => {
     fetchQuery({ query })
-      .then(({ board }: { board: Board | null}) => {
+      .then(({ board }: { board: Board | null }) => {
         if (board) {
           setState((state) => ({
             ...state,
-            ...getOffsetAndSize(
-              board.possibleSteps.reduce(({ min, max }, { x, y }) => ({
-                min: {
-                  x: Math.min(x, min.x),
-                  y: Math.min(y, min.y),
-                },
-                max: {
-                  x: Math.max(x, max.x),
-                  y: Math.max(y, max.y),
-                },
-              }), {
-                min: { x: 0, y: 0},
-                max: { x: 0, y: 0},
-              })
-            ),
+            ...getOffsetAndSize(board.possibleSteps),
             board: board,
             symbols: board.order.reduce(
               (store, { id }, index) => (
@@ -226,39 +225,35 @@ const Board: React.FC<BoardProps> = ({ viewer, selected, onSelect }) => {
       }).catch(
         (err) => console.error(err)
       )
-    const { dispose } = requestSubscription(
-      {
-        subscription,
-        onNext: ({
-          waitBoardChange: boardChange,
-        }: {
-          waitBoardChange: BoardFromSubscription | null
-        }) => {
-          if (boardChange) {
-            setState((state) => (
-              state.board
-              ? updateBounds({
-                ...state,
-                board: {
-                  ...state.board,
-                  ...boardChange,
-                  cells: (
-                    boardChange.lastStep
-                    ? state.board.cells.concat(boardChange.lastStep)
-                    : state.board.cells
-                  ),
-                },
-              })
-              :
-              state
-            ))
-          } else {
-            dispose()
-            throw new Error("Board is null")
-          }
-        },
-      }
-    )
+    const { dispose } = requestSubscription({
+      subscription,
+      onNext: ({
+        waitBoardChange: boardChange,
+      }: {
+        waitBoardChange: BoardFromSubscription | null
+      }) => {
+        if (boardChange) {
+          setState((state) => (
+            state.board
+            ? updateBounds({
+              ...state,
+              board: {
+                ...state.board,
+                ...boardChange,
+                cells: [
+                  ...state.board.cells,
+                  ...(boardChange.lastStep ? [boardChange.lastStep] : []),
+                ],
+              },
+            })
+            : state
+          ))
+        } else {
+          dispose()
+          throw new Error("Board change is null")
+        }
+      },
+    })
   }, [])
 
   return (
