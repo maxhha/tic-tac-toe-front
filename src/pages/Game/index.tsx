@@ -8,6 +8,10 @@ import {
 import makeStepMutation from "mutations/makeStep"
 
 import {
+  requestSubscription,
+} from "utils"
+
+import {
   QueryRenderer,
 } from "components"
 
@@ -16,7 +20,21 @@ import {
   Heading,
 } from "styles"
 
-import Board from "./Board"
+import {
+  User,
+  UserWithName,
+  Position,
+  Cell,
+  View,
+  Board,
+} from "./types"
+
+import {
+  getViewFromBoard,
+  updateGameBoardView,
+} from "./utils"
+
+import BoardView from "./BoardView"
 
 import {
   ControlButton,
@@ -25,6 +43,39 @@ import {
 const query = graphql`
   query GameQuery {
     board {
+      cells {
+        position {
+          x
+          y
+        }
+        owner {
+          id
+        }
+      }
+      possibleSteps {
+        x
+        y
+      }
+      lastStep {
+        position {
+          x
+          y
+        }
+        owner {
+          id
+        }
+      }
+      order {
+        id
+      }
+      winner {
+        id
+        name
+      }
+      winnerLine {
+        x
+        y
+      }
       currentPlayer {
         id
       }
@@ -35,37 +86,96 @@ const query = graphql`
   }
 `
 
-interface QueryBoard {
-  currentPlayer: {
-    id: string,
-  } | null,
-}
+const subscription = graphql`
+  subscription GameBoardChangeSubscription {
+    waitBoardChange {
+      lastStep {
+        position {
+          x
+          y
+        }
+        owner {
+          id
+        }
+      }
+      possibleSteps {
+        x
+        y
+      }
+      currentPlayer {
+        id
+      }
+      winner {
+        id
+        name
+      }
+      winnerLine {
+        x
+        y
+      }
+    }
+  }
+`
 
-interface QueryViewer {
-  id: string,
+interface SubscriptionBoard {
+  possibleSteps: Position[],
+  lastStep: Cell,
+  currentPlayer: User | null,
+  winner: UserWithName | null,
+  winnerLine: Position[] | null,
 }
 
 interface GameBoardProps {
-  board: QueryBoard,
-  viewer: QueryViewer,
-}
-
-interface Position {
-  x: number,
-  y: number,
+  board: Board,
+  viewer: User,
 }
 
 interface GameBoardState {
+  board: Board,
   selected: Position | null,
   busy: boolean,
+  view: View,
 }
 
 const GameBoard: React.FC<GameBoardProps> = (props) => {
 
   const [state, setState] = React.useState<GameBoardState>({
+    board: props.board,
     selected: null,
     busy: false,
+    view: getViewFromBoard(props.board),
   })
+
+  React.useEffect(() => {
+    console.log("reconnect")
+    const { dispose } = requestSubscription({
+      subscription,
+      onNext: ({
+        waitBoardChange: newBoard,
+      }: {
+        waitBoardChange: SubscriptionBoard | null,
+      }) => {
+        if (newBoard) {
+          setState((state) => ({
+            ...state,
+            board: {
+              ...state.board,
+              ...newBoard,
+              cells: [
+                ...state.board.cells,
+                newBoard.lastStep,
+              ],
+            },
+            view: updateGameBoardView(
+              state.view,
+              newBoard.lastStep.position,
+            )
+          }))
+        }
+      },
+    })
+    return dispose
+  }, [props.board])
 
   const {
     selected,
@@ -79,42 +189,54 @@ const GameBoard: React.FC<GameBoardProps> = (props) => {
       ({ response, errors}) => {
         if (errors) {
           console.error(errors)
-          setState({...state, busy: false})
+          setState(state => ({...state, busy: false}))
           return
         }
         if (response && response.makeStep) {
-          setState({
+          setState(state => ({
             ...state,
             busy: false,
             selected: null,
-          })
+          }))
         } else {
           throw new Error("makeStep response is null")
         }
       }
     ).catch((err) => {
       console.error(err)
-      setState({
+      setState(state => ({
         ...state,
         busy: false,
-      })
+      }))
     })
   }
 
   return (
     <>
-      <Board
+      <BoardView
+        board={state.board}
+        view={state.view}
+        selected={state.selected}
         viewer={props.viewer}
-        selected={selected}
         onSelect={(selected) => setState({ ...state, selected})}
       />
-      <ControlButton
-        onClick={() => selected && makeStep(selected)}
-        onTouchEnd={() => selected && makeStep(selected)}
-        disabled={!selected || state.busy}
-      >
-        Make turn
-      </ControlButton>
+      {
+        state.board.winner
+        ? (
+          <ControlButton
+          >
+            Restart
+          </ControlButton>
+        ) : (
+          <ControlButton
+            onClick={() => selected && makeStep(selected)}
+            onTouchEnd={() => selected && makeStep(selected)}
+            disabled={!selected || state.busy}
+          >
+            Make turn
+          </ControlButton>
+        )
+      }
     </>
   )
 }
@@ -127,8 +249,8 @@ const GamePage: React.FC = () => (
         viewer,
         board,
       }: {
-        board: QueryBoard | null,
-        viewer: QueryViewer | null,
+        board: Board | null,
+        viewer: User | null,
       }) => (
         viewer
         ? board
