@@ -70,12 +70,12 @@ const Register: React.FC<Props> = ({
             id: room.id,
           })
         } else {
-          setBusy(false)
           console.error(errors)
           return null
         }
       }
     ).then((result) => {
+      setBusy(false)
       if (!result) return
       const { response } = result
       if (response && response.enterRoom) {
@@ -87,7 +87,6 @@ const Register: React.FC<Props> = ({
       } else {
         console.error(result.errors)
       }
-      setBusy(false)
     })
     setBusy(true)
   }

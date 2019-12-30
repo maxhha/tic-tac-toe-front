@@ -1,5 +1,6 @@
 import { execute, DocumentNode } from 'apollo-link'
 import { WebSocketLink } from 'apollo-link-ws'
+import { SubscriptionClient, Middleware } from 'subscriptions-transport-ws';
 import {
   Environment,
   Network,
@@ -11,16 +12,25 @@ import {
 
 import { getAuthorizationToken } from "utils"
 
-const subscribtionUri = process.env.REACT_APP_SUBSCRIPTIONS_URL || 'ws://localhost:4000/graphql';
+const subscribtionUrl = process.env.REACT_APP_SUBSCRIPTIONS_URL || 'ws://localhost:4000/graphql';
 
-const subscriptionLink = new WebSocketLink({
-  uri: subscribtionUri,
-  options: {
-    lazy: true,
+const subscriptionClient = new SubscriptionClient(
+  subscribtionUrl,
+  {
     reconnect: true,
-    connectionParams: () => Promise.resolve({ authorization: getAuthorizationToken() }),
+  },
+)
+
+const subscriptionMiddleware: Middleware = {
+  applyMiddleware(options, next) {
+    options.authorization = getAuthorizationToken()
+    next()
   }
-})
+}
+
+subscriptionClient.use([subscriptionMiddleware])
+
+const subscriptionLink = new WebSocketLink(subscriptionClient)
 
 const networkSubscriptions: any = (operation: {text: DocumentNode}, variables: Variables) =>
   execute(subscriptionLink, {
