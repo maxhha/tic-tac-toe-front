@@ -4,6 +4,7 @@ import {
   withRouter,
   RouteComponentProps,
   Redirect,
+  Link,
 } from "react-router-dom"
 
 import {
@@ -71,6 +72,21 @@ const CantEnter: React.FC = () => (
   </Page>
 )
 
+const LastRoom: React.FC<Props> = ({ getRoom: room }) => (
+  room
+  ? (
+    <Page>
+      <Heading.h2>
+        The game in previous room was not finished.<br/>
+        <Link to="/game">Return</Link><br/>
+        <Link to={`/register/${room.id}`}>Enter "{room.name}"</Link>
+      </Heading.h2>
+    </Page>
+  ) : (
+    <NotFound />
+  )
+)
+
 const Room: React.FC<Props> = ({ viewer, getRoom: room}) => {
   if (room) {
     if (room.gameActive){
@@ -107,7 +123,7 @@ export default withRouter((
             return <Wait />
           }
         } else if (viewer.currentRoom.gameActive) {
-          return "Игрок не закончил прошлую игру"
+          return <LastRoom getRoom={room} viewer={viewer} />
         }
       }
       return <Room getRoom={room} viewer={viewer} />
