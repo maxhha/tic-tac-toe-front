@@ -49,12 +49,11 @@ const WaitRoom: React.FC<RouteComponentProps> = ({ history }) => {
       onNext: (responce) => {
         if (responce.waitForOtherUserEnter.gameActive) {
           history.push("/game")
-          dispose()
         }
       },
     })
     return dispose
-  }, [history])
+  })
   return (
     <Page>
       <Heading.h2>Waiting for other player</Heading.h2>

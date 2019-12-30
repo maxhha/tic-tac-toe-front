@@ -66,7 +66,6 @@ const Register: React.FC<Props> = ({
       ({ response, errors}) => {
         if (response && response.createUser) {
           setAuthorizationToken(response.createUser)
-          console.log(room.id)
           return commitEnterRoomMutation({
             id: room.id,
           })
