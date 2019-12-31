@@ -10,7 +10,7 @@ export const ControlButton = styled.button`
   top: 100%;
   left: 50%;
   padding: 1rem 1rem;
-  min-width: 20rem;
+  min-width: 10rem;
 
   background-color: #CEC;
   outline: none;
@@ -19,7 +19,7 @@ export const ControlButton = styled.button`
   font-family: monospace;
   text-align: center;
   color: black;
-  font-size: 2rem;
+  font-size: 1rem;
 
   cursor: pointer;
 
@@ -51,10 +51,10 @@ export const PlayersInfoWrapper = styled.div`
   }
   & span {
     padding: 0 1rem;
-    font-size: 4rem;
+    font-size: 2rem;
   }
   & label {
-    font-size: 1.75rem;
+    font-size: 1rem;
   }
 `
 

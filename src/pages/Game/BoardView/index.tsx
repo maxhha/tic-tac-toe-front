@@ -62,6 +62,7 @@ const BoardView: React.FC<BoardProps> = (props) => {
   ), [
     board,
     offset,
+    symbols,
   ])
 
   const possibleSteps = React.useMemo(() => (
