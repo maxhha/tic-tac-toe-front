@@ -75,7 +75,6 @@ export const PlayersInfoView: React.FC<PlayersInfoProps> = ({
   symbols,
   current,
 }) => (
-  console.log("rererender") as undefined ||
   <PlayersInfoWrapper>
     {players.map(({ id, name }, index) => (
       <div

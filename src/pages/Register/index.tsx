@@ -3,6 +3,7 @@ import { graphql } from 'babel-plugin-relay/macro'
 
 import commitCreateUserMutation from "mutations/createUser"
 import commitEnterRoomMutation from "mutations/enterRoom"
+import commitSetReadyMutation from "mutations/setReady"
 
 import {
   withRouter,
@@ -74,12 +75,17 @@ const Register: React.FC<Props> = ({
           return null
         }
       }
-    ).then((result) => {
+    )
+    .then(result => {
+      if (!result) return result
+      return commitSetReadyMutation(true)
+    })
+    .then((result) => {
       setBusy(false)
       if (!result) return
       const { response } = result
-      if (response && response.enterRoom) {
-        if (response.enterRoom.gameActive) {
+      if (response && response.setReady) {
+        if (response.setReady.gameActive) {
           history.push("/game")
         } else {
           history.push(`/${room.id}`)

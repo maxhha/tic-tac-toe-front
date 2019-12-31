@@ -8,6 +8,8 @@ import {
   requestSubscription,
 } from "utils"
 
+import commitSetReadyMutation from "mutations/setReady"
+
 import {
   Page,
   Heading,
@@ -36,7 +38,7 @@ const QRCode: React.FC<{data: string}> = ({ data }) => {
 
 const subscription = graphql`
   subscription WaitPlayerSubscription {
-    waitForOtherUserEnter {
+    waitForOtherUser {
       gameActive
     }
   }
@@ -52,6 +54,7 @@ const WaitRoom: React.FC<RouteComponentProps> = ({ history }) => {
         }
       },
     })
+    commitSetReadyMutation(true)
     return dispose
   })
   return (
