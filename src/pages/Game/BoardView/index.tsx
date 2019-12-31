@@ -35,6 +35,70 @@ const BoardView: React.FC<BoardProps> = (props) => {
     },
   } = props
 
+  const cells = React.useMemo(() => (
+    board.cells.map(({ position: { x, y }, owner: { id } }) => (
+      <FieldCell
+        key={`${x};${y}:${id}`}
+        style={{
+          gridColumn: x - offset.x + 2, /* grid starts from 1*/
+          gridRow: y - offset.y + 2, /*and add offset for step*/
+        }}
+        highlight={
+          (
+            board.lastStep !== null
+            && x === board.lastStep.position.x
+            && y === board.lastStep.position.y
+          ) || (
+            board.winnerLine !== null
+            && board.winnerLine.findIndex(
+              p => p.x === x && p.y === y
+            ) >= 0
+          )
+        }
+      >
+        {symbols[id]}
+      </FieldCell>
+    ))
+  ), [
+    board,
+    offset,
+  ])
+
+  const possibleSteps = React.useMemo(() => (
+    board.currentPlayer
+    && board.currentPlayer.id === viewer.id
+    && board.possibleSteps.map(({x, y}) => (
+      <FieldStep
+        key={`${x};${y}`}
+        style={{
+          gridColumn: x - offset.x + 2, /* grid starts from 1*/
+          gridRow: y - offset.y + 2, /*and add offset for step*/
+        }}
+        onClick={(e) => {
+            onSelect({ x, y })
+            e.stopPropagation()
+        }}
+        onTouchEnd={(e) => {
+            onSelect({ x, y })
+            e.stopPropagation()
+        }}
+        children={
+          selected !== null
+          && x === selected.x
+          && y === selected.y
+          && symbols[viewer.id]
+        }
+      />
+    ))
+  ), [
+    selected,
+    onSelect,
+    board,
+    offset,
+    symbols,
+    viewer,
+  ])
+
   return (
     <MapInteractionCSS
       containerAsEventTarget={true}
@@ -46,56 +110,8 @@ const BoardView: React.FC<BoardProps> = (props) => {
           transform: `translate(${4*offset.x + 2*(size.x - 1)}rem, ${4*offset.y + 2*(size.y - 1)}rem)`,
         }}
       >
-        {board.cells.map(({ position: { x, y }, owner: { id } }) => (
-          <FieldCell
-            key={`${x};${y}:${id}`}
-            style={{
-              gridColumn: x - offset.x + 2, /* grid starts from 1*/
-              gridRow: y - offset.y + 2, /*and add offset for step*/
-            }}
-            highlight={
-              (
-                board.lastStep !== null
-                && x === board.lastStep.position.x
-                && y === board.lastStep.position.y
-              ) || (
-                board.winnerLine !== null
-                && board.winnerLine.findIndex(
-                  p => p.x === x && p.y === y
-                ) >= 0
-              )
-            }
-          >
-            {symbols[id]}
-          </FieldCell>
-        ))}
-        {
-          board.currentPlayer
-          && board.currentPlayer.id === viewer.id
-          && board.possibleSteps.map(({x, y}) => (
-            <FieldStep
-              key={`${x};${y}`}
-              style={{
-                gridColumn: x - offset.x + 2, /* grid starts from 1*/
-                gridRow: y - offset.y + 2, /*and add offset for step*/
-              }}
-              onClick={(e) => {
-                  onSelect({ x, y })
-                  e.stopPropagation()
-              }}
-              onTouchEnd={(e) => {
-                  onSelect({ x, y })
-                  e.stopPropagation()
-              }}
-              children={
-                selected !== null
-                && x === selected.x
-                && y === selected.y
-                && symbols[viewer.id]
-              }
-            />
-          ))
-        }
+        { cells }
+        { possibleSteps }
       </Field>
     </MapInteractionCSS>
   )
