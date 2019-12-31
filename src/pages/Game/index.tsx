@@ -38,6 +38,7 @@ import BoardView from "./BoardView"
 
 import {
   ControlButton,
+  PlayersInfoView,
 } from "./elements"
 
 const query = graphql`
@@ -67,6 +68,7 @@ const query = graphql`
       }
       order {
         id
+        name
       }
       winner {
         id
@@ -147,7 +149,6 @@ const GameBoard: React.FC<GameBoardProps> = (props) => {
   })
 
   React.useEffect(() => {
-    console.log("reconnect")
     const { dispose } = requestSubscription({
       subscription,
       onNext: ({
@@ -176,10 +177,6 @@ const GameBoard: React.FC<GameBoardProps> = (props) => {
     })
     return dispose
   }, [props.board])
-
-  const {
-    selected,
-  } = state
 
   const makeStep = (position: Position) => {
     setState({...state, busy: true})
@@ -211,6 +208,29 @@ const GameBoard: React.FC<GameBoardProps> = (props) => {
     })
   }
 
+  const {
+    selected,
+  } = state
+
+  const playersInfo = React.useMemo(() => (
+    <PlayersInfoView
+      players={state.board.order.slice().sort(
+        u => u.id === props.viewer.id ? -1 : 1
+      )}
+      symbols={state.view.symbols}
+      current={
+        state.board.currentPlayer
+        ? state.board.currentPlayer.id
+        : undefined
+      }
+    />
+  ), [
+    state.board.currentPlayer,
+    props.viewer,
+    state.board.order,
+    state.view.symbols,
+  ])
+
   return (
     <>
       <BoardView
@@ -220,6 +240,7 @@ const GameBoard: React.FC<GameBoardProps> = (props) => {
         viewer={props.viewer}
         onSelect={(selected) => setState({ ...state, selected})}
       />
+      { playersInfo }
       {
         state.board.winner
         ? (

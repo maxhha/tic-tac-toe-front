@@ -20,7 +20,7 @@ export interface Cell {
 export interface Board {
   cells: Cell[],
   possibleSteps: Position[],
-  order: UserWithName[],
+  order: Player[],
   lastStep: Cell,
   currentPlayer: User | null,
   winner: UserWithName | null,
@@ -31,4 +31,8 @@ export interface View {
   offset: Position,
   size: Position,
   symbols: { [id: string]: string },
+}
+
+export interface Player extends UserWithName {
+
 }
