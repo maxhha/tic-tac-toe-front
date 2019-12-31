@@ -33,6 +33,12 @@ export interface View {
   symbols: { [id: string]: string },
 }
 
+export interface Viewer extends User {
+  currentRoom: {
+    id: string,
+  },
+}
+
 export interface Player extends UserWithName {
 
 }

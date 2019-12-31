@@ -3,6 +3,7 @@ import { graphql } from "babel-plugin-relay/macro"
 
 import {
   Redirect,
+  Link,
 } from "react-router-dom"
 
 import makeStepMutation from "mutations/makeStep"
@@ -23,6 +24,7 @@ import {
 import {
   User,
   UserWithName,
+  Viewer,
   Position,
   Cell,
   View,
@@ -84,6 +86,9 @@ const query = graphql`
     }
     viewer {
       id
+      currentRoom {
+        id
+      }
     }
   }
 `
@@ -129,7 +134,7 @@ interface SubscriptionBoard {
 
 interface GameBoardProps {
   board: Board,
-  viewer: User,
+  viewer: Viewer,
 }
 
 interface GameBoardState {
@@ -244,10 +249,12 @@ const GameBoard: React.FC<GameBoardProps> = (props) => {
       {
         state.board.winner
         ? (
-          <ControlButton
-          >
-            Restart
-          </ControlButton>
+          <Link to={`/${props.viewer.currentRoom.id}`}>
+            <ControlButton
+            >
+              Restart
+            </ControlButton>
+          </Link>
         ) : (
           <ControlButton
             onClick={() => selected && makeStep(selected)}
@@ -271,7 +278,7 @@ const GamePage: React.FC = () => (
         board,
       }: {
         board: Board | null,
-        viewer: User | null,
+        viewer: Viewer | null,
       }) => (
         viewer
         ? board
