@@ -10,23 +10,13 @@ import {
 } from "styles"
 
 import commitCreateUserMutation from "mutations/createUser"
+import commitCreateRoomMutation from "mutations/createRoom"
 
 import {
-  commitMutation,
   setAuthorizationToken,
 } from "utils"
 
-const createRoomMutation = graphql`
-  mutation LoginCreateRoomMutation(
-    $name: String!
-  ) {
-    createRoom(name: $name){
-      id
-    }
-  }
-`
-
-const Login: React.FC<RouteComponentProps> = ({ history }) => {
+const Signup: React.FC<RouteComponentProps> = ({ history }) => {
   const userName = React.createRef<HTMLInputElement>()
   const roomName = React.createRef<HTMLInputElement>()
   const [busy, setBusy] = React.useState<boolean>(false)
@@ -50,10 +40,7 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
 
         if (response && response.createUser) {
           setAuthorizationToken(response.createUser)
-          return commitMutation({
-            mutation: createRoomMutation,
-            variables: { name },
-          })
+          return commitCreateRoomMutation({ name })
         } else {
           setBusy(false)
           console.error(errors)
@@ -65,7 +52,7 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
       if (result.errors)
         console.error(result.errors)
 
-      if (result.response) {
+      if (result.response && result.response.createRoom) {
         history.push("/"+result.response.createRoom.id)
       } else {
         setBusy(false)
@@ -83,4 +70,4 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
   )
 }
 
-export default withRouter(Login)
+export default withRouter(Signup)
