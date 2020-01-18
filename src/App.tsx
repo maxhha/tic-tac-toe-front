@@ -5,6 +5,11 @@ import Register from "pages/Register"
 import Game from "pages/Game"
 import Signup from "pages/Signup"
 import NewRoom from "pages/NewRoom"
+import Return from "pages/Return"
+
+import ViewerContext, {
+  ViewerContextProvider,
+} from "contexts/viewer"
 
 import {
   HashRouter as Router,
@@ -14,16 +19,28 @@ import {
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/" component={Main} />
-        <Route path="/signup" component={Signup} />
-        <Route path="/new" component={NewRoom} />
-        <Route path="/game" component={Game} />
-        <Route path="/register/:id" component={Register} />
-        <Route path="/:id" component={Room} />
-      </Switch>
-    </Router>
+    <ViewerContextProvider>
+      <Router>
+        <Switch>
+          <Route exact path="/" component={Main} />
+          {/*
+          <Route path="/signup" component={Signup} />
+          <Route path="/new" component={NewRoom} />
+          */}
+          <ViewerContext.Consumer>
+            {({ viewer }) => (
+              viewer && <Route path="/game" component={Game} />
+            )}
+          </ViewerContext.Consumer>
+          {/*
+          <Route exact path="/return" component={Return} />
+          <Route path="/enter/:id" component={Return} />
+          <Route path="/register/:id" component={Register} />
+          */}
+          <Route path="/:id" component={Room} />
+        </Switch>
+      </Router>
+    </ViewerContextProvider>
   )
 }
 
