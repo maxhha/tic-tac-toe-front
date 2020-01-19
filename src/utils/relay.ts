@@ -20,21 +20,23 @@ export const fetchQuery = ({
   variables,
 )
 
-type onCompleted<R = any> = { response?: R, errors?: ReadonlyArray<PayloadError> | null }
-
 export const commitMutation = <R = any>({
   mutation,
   variables,
 }:{
   mutation: GraphQLTaggedNode,
   variables?: Variables,
-}) => new Promise<onCompleted<R>>((resolve, reject) => {
+}) => new Promise<R>((resolve, reject) => {
     relayCommitMutation(
       environment,
       {
         mutation,
         variables: variables || {},
-        onCompleted: (response, errors) => resolve({ response: response as R, errors }),
+        onCompleted: (response, errors) => {
+          if (errors)
+            reject(errors)
+          resolve(response as R)
+        },
         onError: reject,
       },
     )

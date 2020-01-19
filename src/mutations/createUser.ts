@@ -13,4 +13,4 @@ const mutation = graphql`
 
 export default (input: {
   name: string,
-}) => commitMutation<{ createUser: string | null }>({ mutation, variables: { input } })
+}) => commitMutation<{ createUser: string }>({ mutation, variables: { input } })

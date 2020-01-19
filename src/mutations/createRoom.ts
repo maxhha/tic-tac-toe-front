@@ -18,5 +18,5 @@ export default (variables: {
 }) => commitMutation<{
   createRoom: {
     id: string,
-  } | null,
+  },
 }>({ mutation, variables })

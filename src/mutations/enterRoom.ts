@@ -18,5 +18,5 @@ export default (variables: {
 }) => commitMutation<{
   enterRoom: {
     gameActive: boolean,
-  } | null,
+  },
 }>({ mutation, variables })
