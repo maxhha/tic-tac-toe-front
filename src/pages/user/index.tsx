@@ -12,7 +12,6 @@ const User: React.FC = () => (
   <Switch>
     <Route exact path="/" component={Main} />
     {/*
-    <Route path="/signup" component={Signup} />
     <Route path="/new" component={NewRoom} />
     */}
     <Route path="/game" component={Game} />

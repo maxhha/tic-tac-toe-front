@@ -19,7 +19,7 @@ const query = graphql`
   }
 `
 
-interface Viewer {
+export interface Viewer {
   id: string,
   name: string,
   currentRoom: {
