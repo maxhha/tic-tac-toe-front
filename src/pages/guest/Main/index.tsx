@@ -47,8 +47,8 @@ const Main: React.FC<RouteComponentProps> = ({ history }) => {
           name: room,
         })
 
-        history.push("/"+roomId)
         setBusy(false)
+        history.push("/"+roomId)
         updateUser()
       })
       .catch((errors) => {
