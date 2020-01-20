@@ -25,25 +25,9 @@ import {
   Heading,
 } from "styles"
 
-const query = graphql`
-  query RoomQuery($id: ID!) {
-    getRoom(id: $id) {
-      id
-      name
-      gameActive
-    }
-  }
-`
-
-interface Room {
-  id: string,
-  name: string,
-  gameActive: string,
-}
-
-interface RoomQuery {
-  getRoom: Room | null,
-}
+import RoomQueryContainer, {
+  Room,
+} from "containers/roomQuery"
 
 const NotFound: React.FC = () => (
   <Page>
@@ -114,6 +98,12 @@ const Room: React.FC<Props> = props => {
   return null
 }
 
+const RoomQuery = RoomQueryContainer<{viewer: Viewer}>(({ getRoom: room, viewer }) => (
+  room
+  ? <Room viewer={viewer} room={room} />
+  : <NotFound />
+))
+
 export default withRouter((
   props: RouteComponentProps<{id: string}>
 ) => (
@@ -121,16 +111,11 @@ export default withRouter((
     {({ viewer }) => (
       viewer
       ? (
-        <QueryRenderer
-          query={query}
+        <RoomQuery
           variables={{
-            id: props.match.params.id,
+            roomId: props.match.params.id,
           }}
-          render={({ getRoom: room }: RoomQuery) => (
-            room
-            ? <Room viewer={viewer} room={room} />
-            : <NotFound />
-          )}
+          viewer={viewer}
         />
       )
       : <Redirect to="/" />
