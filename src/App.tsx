@@ -8,7 +8,6 @@ import Main2 from "pages/Main"
 import NewRoom from "pages/NewRoom"
 import Register from "pages/Register"
 import Return from "pages/Return"
-import Room from "pages/Room"
 
 import Main from "pages"
 

@@ -55,7 +55,10 @@ const WaitRoom: React.FC<RouteComponentProps> = ({ history }) => {
       },
     })
     commitSetReadyMutation(true)
-    return dispose
+    return () => {
+      dispose()
+      commitSetReadyMutation(false)
+    }
   })
   return (
     <Page>

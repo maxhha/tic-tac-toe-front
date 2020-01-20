@@ -11,7 +11,6 @@ const Guest: React.FC = () => (
   <Switch>
     <Route exact path="/" component={Main} />
     {/*
-    <Route path="/signup" component={Signup} />
     <Route path="/new" component={NewRoom} />
     */}
     {/*

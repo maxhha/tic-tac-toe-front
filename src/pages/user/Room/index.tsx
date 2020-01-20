@@ -4,6 +4,7 @@ import {
   withRouter,
   RouteComponentProps,
   Redirect,
+  Link,
 } from "react-router-dom"
 
 import {
@@ -16,6 +17,8 @@ import commitEnterRoomMutation from "mutations/enterRoom"
 import ViewerContext, {
   Viewer,
 } from "contexts/viewer"
+
+import Wait from "./Wait"
 
 import {
   Page,
@@ -42,16 +45,32 @@ interface RoomQuery {
   getRoom: Room | null,
 }
 
-const Main: React.FC = ({}) => (
-  null
 const NotFound: React.FC = () => (
   <Page>
     <Heading.h2>Cant find room</Heading.h2>
   </Page>
 )
+
+const RoomIsActive: React.FC<{room: Room}> = ({ room }) => (
+  <Page>
+    <Heading.h2>
+      Game in room "{room.name}" has already started
+    </Heading.h2>
+  </Page>
 )
 
-export default Main;
+const LastRoom: React.FC<{
+  room: Room,
+}> = ({ room }) => ( // TODO:
+  <Page>
+    <Heading.h2>
+      The game in previous room was not finished.<br/>
+      <Link to="/game">Return</Link><br/>
+      <Link to={`/register/${room.id}`}>Enter "{room.name}"</Link>
+    </Heading.h2>
+  </Page>
+)
+
 interface Props {
   room: Room,
   viewer: Viewer,
@@ -88,7 +107,7 @@ const Room: React.FC<Props> = props => {
   if (viewer.currentRoom === null) {
     return <EnterRoom {...props} />
   } else if (viewer.currentRoom.id === room.id) {
-    return <>WAIT</>
+    return room.gameActive ? <Redirect to="/game"/> : <Wait />
   } else {
 
   }
