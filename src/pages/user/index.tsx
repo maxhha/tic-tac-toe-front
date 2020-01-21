@@ -18,7 +18,6 @@ const User: React.FC = () => (
     {/*
     <Route exact path="/return" component={Return} />
     <Route path="/enter/:id" component={Return} />
-    <Route path="/register/:id" component={Register} />
     */}
     <Route path="/:id" component={Room} />
   </Switch>

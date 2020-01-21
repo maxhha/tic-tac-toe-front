@@ -7,7 +7,7 @@ import {
 
 const query = graphql`
   query roomQueryForRoomQuery($roomId: ID!) {
-    getRoom(id: $roomId) {
+    room: getRoom(id: $roomId) {
       id
       name
       gameActive
@@ -22,7 +22,7 @@ export interface Room {
 }
 
 export interface RoomQuery {
-  getRoom: Room | null,
+  room: Room | null,
 }
 
 export interface RoomQueryVariables {

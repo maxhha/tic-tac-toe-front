@@ -38,7 +38,7 @@ const Main: React.FC<RouteComponentProps> = ({ history }) => {
       room: roomName.current.value,
     })
       .then(async ({ user, room }) => {
-        const { createUser: token } = await commitCreateUserMutation({
+        const { token } = await commitCreateUserMutation({
           name: user,
         })
 

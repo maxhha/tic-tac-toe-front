@@ -5,7 +5,7 @@ import {
   Variables,
   GraphQLTaggedNode,
 } from "react-relay"
-import { PayloadError } from "relay-runtime"
+
 import environment from "environment"
 
 export const fetchQuery = ({

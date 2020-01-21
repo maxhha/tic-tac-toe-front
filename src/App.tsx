@@ -6,7 +6,6 @@ import {
 import Game from "pages/Game"
 import Main2 from "pages/Main"
 import NewRoom from "pages/NewRoom"
-import Register from "pages/Register"
 import Return from "pages/Return"
 
 import Main from "pages"

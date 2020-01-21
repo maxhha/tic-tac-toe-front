@@ -98,7 +98,7 @@ const Room: React.FC<Props> = props => {
   return null
 }
 
-const RoomQuery = RoomQueryContainer<{viewer: Viewer}>(({ getRoom: room, viewer }) => (
+const RoomQuery = RoomQueryContainer<{viewer: Viewer}>(({ room, viewer }) => (
   room
   ? <Room viewer={viewer} room={room} />
   : <NotFound />

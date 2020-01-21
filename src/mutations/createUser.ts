@@ -7,10 +7,10 @@ const mutation = graphql`
   mutation createUserMutation(
     $input: createUserInput!
   ) {
-    createUser(input: $input)
+    token: createUser(input: $input)
   }
 `
 
 export default (input: {
   name: string,
-}) => commitMutation<{ createUser: string }>({ mutation, variables: { input } })
+}) => commitMutation<{ token: string }>({ mutation, variables: { input } })
