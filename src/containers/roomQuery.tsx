@@ -6,7 +6,7 @@ import {
 } from "components"
 
 const query = graphql`
-  query RoomQueryForRoomQuery($roomId: ID!) {
+  query roomQueryForRoomQuery($roomId: ID!) {
     getRoom(id: $roomId) {
       id
       name

@@ -26,7 +26,7 @@ import {
 } from "styles"
 
 import RoomQueryContainer, {
-  Room,
+  Room as IRoom,
 } from "containers/roomQuery"
 
 const NotFound: React.FC = () => (
@@ -35,7 +35,7 @@ const NotFound: React.FC = () => (
   </Page>
 )
 
-const RoomIsActive: React.FC<{room: Room}> = ({ room }) => (
+const RoomIsActive: React.FC<{room: IRoom}> = ({ room }) => (
   <Page>
     <Heading.h2>
       Game in room "{room.name}" has already started
@@ -44,7 +44,7 @@ const RoomIsActive: React.FC<{room: Room}> = ({ room }) => (
 )
 
 const LastRoom: React.FC<{
-  room: Room,
+  room: IRoom,
 }> = ({ room }) => ( // TODO:
   <Page>
     <Heading.h2>
@@ -56,7 +56,7 @@ const LastRoom: React.FC<{
 )
 
 interface Props {
-  room: Room,
+  room: IRoom,
   viewer: Viewer,
 }
 
