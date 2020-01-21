@@ -77,7 +77,11 @@ const EnterRoom: React.FC<Props> = ({ room, viewer }) => {
           updateUser()
         })
     }
-  }, [])
+  }, [
+    updateUser,
+    viewer,
+    room,
+  ])
 
   return room.gameActive ? <>Game in room is active</> : <>Please, wait...</>
 }
