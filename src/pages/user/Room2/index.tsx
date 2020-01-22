@@ -18,7 +18,7 @@ import ViewerContext, {
   Viewer,
 } from "contexts/viewer"
 
-import Wait from "./Wait"
+//import Wait from "./Wait"
 
 import {
   Page,
@@ -95,7 +95,7 @@ const Room: React.FC<Props> = props => {
   if (viewer.currentRoom === null) {
     return <EnterRoom {...props} />
   } else if (viewer.currentRoom.id === room.id) {
-    return room.gameActive ? <Redirect to="/game"/> : <Wait />
+    return room.gameActive ? <Redirect to="/game"/> : <>{"<Wait />"}</>
   } else {
 
   }

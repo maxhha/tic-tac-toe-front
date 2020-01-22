@@ -9,7 +9,7 @@ const Main: React.FC = () => {
   if (viewer === null) {
     return <Guest />
   } else {
-    return <User />
+    return <User viewer={viewer}/>
   }
 }
 

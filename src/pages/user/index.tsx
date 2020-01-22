@@ -1,26 +1,27 @@
 import React from "react"
-import {
-  Switch,
-  Route,
-} from "react-router-dom"
 
-import Main from "./Main"
+import Lobby from "./lobby"
+import Room from "./room"
+
 import Game from "./Game"
-import Room from "./Room"
+import Main from "./Main"
+import New from "./New"
+import Room2 from "./Room2"
 
-const User: React.FC = () => (
-  <Switch>
-    <Route exact path="/" component={Main} />
-    {/*
-    <Route path="/new" component={NewRoom} />
-    */}
-    <Route path="/game" component={Game} />
-    {/*
-    <Route exact path="/return" component={Return} />
-    <Route path="/enter/:id" component={Return} />
-    */}
-    <Route path="/:id" component={Room} />
-  </Switch>
+import { Viewer } from "contexts/viewer"
+
+interface Props {
+  viewer: Viewer,
+}
+
+const User: React.FC<Props> = ({
+  viewer: {
+    currentRoom: room,
+  }
+}) => (
+    room === null
+    ? <Lobby />
+    : <Room room={room} />
 )
 
 export default User

@@ -19,14 +19,16 @@ const query = graphql`
   }
 `
 
+export interface Room {
+  id: string,
+  name: string,
+  gameActive: boolean,
+}
+
 export interface Viewer {
   id: string,
   name: string,
-  currentRoom: {
-    id: string,
-    name: string,
-    gameActive: boolean,
-  } | null,
+  currentRoom: Room | null,
 }
 
 export interface ViewerContextValue {
