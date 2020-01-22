@@ -4,6 +4,12 @@ import {
   Route,
 } from "react-router-dom"
 
-const Lobby: React.FC = () => null
+import New from "./New"
+
+const Lobby: React.FC = () => (
+  <Switch>
+    <Route path="/new" component={New}/>
+  </Switch>
+)
 
 export default Lobby
