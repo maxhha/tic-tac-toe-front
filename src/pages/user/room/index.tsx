@@ -4,21 +4,13 @@ import {
   Route,
 } from "react-router-dom"
 
-import {
-  Room as IRoom,
-} from "contexts/viewer"
+import RoomMenu from "./Room"
 
-import Wait from "./Wait"
-
-interface Props {
-  room: IRoom,
-}
-
-const Room: React.FC<Props> = ({ room }) => (
+const Room: React.FC = () => (
   <Switch>
+    <Route exact path="/" render={() => "MMenu?"}/>
     <Route path="/game" render={() => "Game"}/>
-    <Route path={`/${room.id}`} component={Wait}/>
-    <Route path="/:id" render={() => "Menu?"}/>
+    <Route path="/:id" component={RoomMenu}/>
   </Switch>
 )
 

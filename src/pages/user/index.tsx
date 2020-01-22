@@ -8,20 +8,19 @@ import Main from "./Main"
 import New from "./New"
 import Room2 from "./Room2"
 
-import { Viewer } from "contexts/viewer"
+import ViewerContext from "contexts/viewer"
 
-interface Props {
-  viewer: Viewer,
-}
-
-const User: React.FC<Props> = ({
-  viewer: {
-    currentRoom: room,
+const User: React.FC = () => {
+  const { viewer } = React.useContext(ViewerContext)
+  if (viewer === null) {
+    throw new Error("Viewer is null")
   }
-}) => (
-    room === null
+
+  return (
+    viewer.currentRoom === null
     ? <Lobby />
-    : <Room room={room} />
-)
+    : <Room />
+  )
+}
 
 export default User
