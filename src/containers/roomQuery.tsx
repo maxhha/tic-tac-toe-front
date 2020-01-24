@@ -18,7 +18,7 @@ const query = graphql`
 export interface Room {
   id: string,
   name: string,
-  gameActive: string,
+  gameActive: boolean,
 }
 
 export interface RoomQuery {

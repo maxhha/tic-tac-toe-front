@@ -19,6 +19,7 @@ import ViewerContext, {
 } from "contexts/viewer"
 
 import Wait from "./Wait"
+import Menu from "./Menu"
 
 import {
   Page,
@@ -39,18 +40,6 @@ const RoomIsActive: React.FC<{room: IRoom}> = ({ room }) => (
   <Page>
     <Heading.h2>
       Game in room "{room.name}" has already started
-    </Heading.h2>
-  </Page>
-)
-
-const LastRoom: React.FC<{
-  room: IRoom,
-}> = ({ room }) => ( // TODO:
-  <Page>
-    <Heading.h2>
-      The game in previous room was not finished.<br/>
-      <Link to="/game">Return</Link><br/>
-      <Link to={`/register/${room.id}`}>Enter "{room.name}"</Link>
     </Heading.h2>
   </Page>
 )
@@ -87,20 +76,29 @@ const EnterRoom: React.FC<EnterRoomProps> = ({ room, viewer }) => {
 }
 
 const Room: React.FC<{ room: IRoom }> = ({ room }) => {
-
   const { viewer } = React.useContext(ViewerContext)
-
   if (viewer === null) {
     throw new Error("Viewer is null")
   }
-
-  if (viewer.currentRoom === null) {
-    return <EnterRoom room={room} viewer={viewer} />
-  } else if (viewer.currentRoom.id === room.id) {
-    return room.gameActive ? <Redirect to="/game"/> : <Wait />
-  } else {
-    return <>Enter room menu</>
+  const { currentRoom } = viewer
+  if (currentRoom === null) {
+    throw new Error("Current room is null")
   }
+
+  return (
+    currentRoom.id === room.id
+    ? room.gameActive
+      ? <Redirect to="/game"/>
+      : <Wait />
+    : room.gameActive
+      ? <RoomIsActive room={room}/>
+      : (
+        <Menu
+          currentRoom={currentRoom}
+          targetRoom={room}
+        />
+      )
+  )
 }
 
 const RoomQuery = RoomQueryContainer(({ room }) => (

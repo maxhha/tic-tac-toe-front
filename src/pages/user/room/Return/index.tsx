@@ -43,7 +43,7 @@ const Return: React.FC = () => {
     <Page>
       <LoginForm>
         <Heading.h2>Hello, {viewer.name}!</Heading.h2>
-        <Link to={`/${currentRoom.id}`}>
+        <Link to={`/${currentRoom.id}`} onClick={(e) => busy && e.preventDefault()}>
           <Button disabled={busy}>
               Return "{currentRoom.name}"
           </Button>
