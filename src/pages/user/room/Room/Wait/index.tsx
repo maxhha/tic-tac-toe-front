@@ -8,6 +8,7 @@ import {
   requestSubscription,
 } from "utils"
 
+import ViewerContext from "contexts/viewer"
 import commitSetReadyMutation from "mutations/setReady"
 
 import {
@@ -45,11 +46,13 @@ const subscription = graphql`
 `
 
 const WaitRoom: React.FC<RouteComponentProps> = ({ history }) => {
+  const { update: updateUser } = React.useContext(ViewerContext)
   React.useEffect(() => {
     const { dispose } = requestSubscription({
       subscription,
-      onNext: (responce) => {
+      onNext: async (responce) => {
         if (responce.waitForOtherUserEnter.gameActive) {
+          await updateUser()
           history.push("/game")
         }
       },

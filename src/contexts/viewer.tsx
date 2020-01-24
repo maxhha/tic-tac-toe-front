@@ -32,12 +32,12 @@ export interface Viewer {
 }
 
 export interface ViewerContextValue {
-  update():void,
+  update():Promise<Viewer | null>,
   viewer: Viewer | null,
 }
 
 const initialValue: ViewerContextValue = {
-  update: () => {},
+  update: async () => null,
   viewer: null,
 }
 
@@ -45,24 +45,27 @@ export const ViewerContext = React.createContext<ViewerContextValue>(initialValu
 
 export const ViewerContextProvider: React.FC = ({ children }) => {
   const [viewer, setViewer] = React.useState<Viewer | null>(null)
-  const busy = React.useRef<Boolean>(false)
+  const busy = React.useRef<Promise<Viewer | null> | null>(null)
 
   const update = React.useCallback(() => {
       if (busy.current) {
-        return
+        return busy.current
       }
-      busy.current = true
-      fetchQuery({
+      busy.current = fetchQuery({
         query,
       })
-        .then(({ viewer }) => {
-          setViewer(viewer)
-          busy.current = false
-        })
-        .catch((error) => {
-          console.error(error)
-          busy.current = false
-        })
+        .then(
+          ({ viewer }) => {
+            setViewer(viewer)
+            busy.current = null
+            return viewer
+          },
+          (error) => {
+            console.error(error)
+            busy.current = null
+          },
+        )
+      return busy.current
     },
     [
       busy,

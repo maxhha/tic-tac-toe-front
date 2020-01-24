@@ -3,9 +3,7 @@ import React from "react"
 import Lobby from "./lobby"
 import Room from "./room"
 
-import Game from "./Game"
 import Main from "./Main"
-import New from "./New"
 import Room2 from "./Room2"
 
 import ViewerContext from "contexts/viewer"

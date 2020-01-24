@@ -3,7 +3,6 @@ import {
   HashRouter as Router,
 } from "react-router-dom"
 
-import Game from "pages/Game"
 import Main2 from "pages/Main"
 import NewRoom from "pages/NewRoom"
 import Return from "pages/Return"

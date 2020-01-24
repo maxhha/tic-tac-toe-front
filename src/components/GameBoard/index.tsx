@@ -2,7 +2,6 @@ import React from "react"
 import { graphql } from "babel-plugin-relay/macro"
 
 import {
-  Redirect,
   Link,
 } from "react-router-dom"
 
@@ -11,15 +10,6 @@ import makeStepMutation from "mutations/makeStep"
 import {
   requestSubscription,
 } from "utils"
-
-import {
-  QueryRenderer,
-} from "components"
-
-import {
-  Page,
-  Heading,
-} from "styles"
 
 import {
   User,
@@ -37,64 +27,15 @@ import {
 } from "./utils"
 
 import BoardView from "./BoardView"
+import UserExited from "./UserExited"
 
 import {
   ControlButton,
   PlayersInfoView,
 } from "./elements"
 
-const query = graphql`
-  query GameQuery {
-    board {
-      cells {
-        position {
-          x
-          y
-        }
-        owner {
-          id
-        }
-      }
-      possibleSteps {
-        x
-        y
-      }
-      lastStep {
-        position {
-          x
-          y
-        }
-        owner {
-          id
-        }
-      }
-      order {
-        id
-        name
-      }
-      winner {
-        id
-        name
-      }
-      winnerLine {
-        x
-        y
-      }
-      currentPlayer {
-        id
-      }
-    }
-    viewer {
-      id
-      currentRoom {
-        id
-      }
-    }
-  }
-`
-
 const subscription = graphql`
-  subscription GameBoardChangeSubscription {
+  subscription GameBoardSubscription {
     waitBoardChange {
       lastStep {
         position {
@@ -124,6 +65,15 @@ const subscription = graphql`
   }
 `
 
+const userExitSubscription = graphql`
+  subscription GameBoardUserExitSubscription {
+    userExit {
+      id
+      name
+    }
+  }
+`
+
 interface SubscriptionBoard {
   possibleSteps: Position[],
   lastStep: Cell,
@@ -135,6 +85,8 @@ interface SubscriptionBoard {
 interface GameBoardProps {
   board: Board,
   viewer: Viewer,
+  onUserExit(e: { user: UserWithName }): void,
+  onGameEnd(): void,
 }
 
 interface GameBoardState {
@@ -142,9 +94,10 @@ interface GameBoardState {
   selected: Position | null,
   busy: boolean,
   view: View,
+  // exited?: UserWithName,
 }
 
-const GameBoard: React.FC<GameBoardProps> = (props) => {
+export const GameBoard: React.FC<GameBoardProps> = (props) => {
 
   const [state, setState] = React.useState<GameBoardState>({
     board: props.board,
@@ -177,24 +130,44 @@ const GameBoard: React.FC<GameBoardProps> = (props) => {
               newBoard.lastStep.position,
             )
           }))
+        } else {
+          console.error("@game Board is null")
+        }
+      },
+    })
+
+    return dispose
+  }, [props.board])
+
+  React.useEffect(() => {
+    const { dispose } = requestSubscription({
+      subscription: userExitSubscription,
+      onNext: ({
+        userExit,
+      }: {
+        userExit: UserWithName | null,
+      }) => {
+        if (userExit) {
+          console.log(`Oh no ${userExit.name} exited room :(`)
+          props.onUserExit({ user: userExit })
+          // setState((state) => ({
+          //   ...state,
+          //   exited: userExit,
+          // }))
         }
       },
     })
     return dispose
-  }, [props.board])
+  }, [])
 
   const makeStep = (position: Position) => {
     setState({...state, busy: true})
     makeStepMutation(
       position,
     ).then(
-      ({ response, errors}) => {
-        if (errors) {
-          console.error(errors)
-          setState(state => ({...state, busy: false}))
-          return
-        }
-        if (response && response.makeStep) {
+      ({ makeStep }) => {
+
+        if (makeStep) {
           setState(state => ({
             ...state,
             busy: false,
@@ -236,6 +209,10 @@ const GameBoard: React.FC<GameBoardProps> = (props) => {
     state.view.symbols,
   ])
 
+  // if (state.exited) {
+  //   return <UserExited user={state.exited} viewer={props.viewer} />
+  // }
+
   return (
     <>
       <BoardView
@@ -268,30 +245,3 @@ const GameBoard: React.FC<GameBoardProps> = (props) => {
     </>
   )
 }
-
-const GamePage: React.FC = () => (
-  <Page>
-    <QueryRenderer
-      query={query}
-      render={({
-        viewer,
-        board,
-      }: {
-        board: Board | null,
-        viewer: Viewer | null,
-      }) => (
-        viewer
-        ? board
-          ? (
-            <GameBoard
-              viewer={viewer}
-              board={board}
-            />
-          ): <Heading.h2> Not in game </Heading.h2>
-        : <Redirect to="/" />
-      )}
-    />
-  </Page>
-)
-
-export default GamePage
