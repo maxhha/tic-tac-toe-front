@@ -3,8 +3,6 @@ import {
   HashRouter as Router,
 } from "react-router-dom"
 
-import Main2 from "pages/Main"
-import NewRoom from "pages/NewRoom"
 import Return from "pages/Return"
 
 import Main from "pages"

@@ -3,9 +3,6 @@ import React from "react"
 import Lobby from "./lobby"
 import Room from "./room"
 
-import Main from "./Main"
-import Room2 from "./Room2"
-
 import ViewerContext from "contexts/viewer"
 
 const User: React.FC = () => {

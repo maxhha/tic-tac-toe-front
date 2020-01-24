@@ -56,13 +56,14 @@ export const ViewerContextProvider: React.FC = ({ children }) => {
       })
         .then(
           ({ viewer }) => {
-            setViewer(viewer)
             busy.current = null
+            setViewer(viewer)
             return viewer
           },
           (error) => {
             console.error(error)
             busy.current = null
+            setViewer(null)
           },
         )
       return busy.current
@@ -85,7 +86,7 @@ export const ViewerContextProvider: React.FC = ({ children }) => {
     ],
   )
 
-  return React.useMemo(() => (
+  const provider = React.useMemo(() => (
       <ViewerContext.Provider value={{ update, viewer }}>
       { children }
       </ViewerContext.Provider>
@@ -96,6 +97,8 @@ export const ViewerContextProvider: React.FC = ({ children }) => {
       children,
     ],
   )
+
+  return busy.current === null ? provider : <>Loading...</>
 }
 
 export default ViewerContext

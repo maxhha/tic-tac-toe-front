@@ -53,7 +53,6 @@ const Main: React.FC<RouteComponentProps> = ({
   return (
     <Page>
       <LoginForm>
-        <Heading.h2>Hello, { viewer.name }!</Heading.h2>
         <Input placeholder="Room name" ref = { roomName } />
         <Button onClick={ handleClick } disabled = { busy } > Create room </Button>
       </LoginForm>
