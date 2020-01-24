@@ -4,11 +4,12 @@ import {
   Route,
 } from "react-router-dom"
 
+import Main from "./Main"
 import New from "./New"
 
 const Lobby: React.FC = () => (
   <Switch>
-    <Route exact path="/" render={() => "go to /new"} />
+    <Route exact path="/" component={Main} />
     <Route path="/new" component={New}/>
   </Switch>
 )
