@@ -27,6 +27,14 @@ import {
   LoginForm,
 } from "styles"
 
+const RoomIsActive: React.FC<{ room: IRoom }> = ({ room }) => (
+  <Page>
+    <Heading.h2>
+      Game in room "{room.name}" has already started
+    </Heading.h2>
+  </Page>
+)
+
 interface Props {
   room: IRoom,
 }
@@ -36,7 +44,7 @@ const Room: React.FC<Props> = ({
 }) => {
   const [busy, setBusy] = React.useState<boolean>(false)
   const userName = React.createRef<HTMLInputElement>()
-  const { update: updateUser } = React.useContext(ViewerContext)
+  const { update } = React.useContext(ViewerContext)
 
   const handleClick = () => {
     if (
@@ -56,7 +64,11 @@ const Room: React.FC<Props> = ({
         })
 
         setBusy(false)
-        updateUser()
+        update()
+      })
+      .catch(error => {
+        console.error(error)
+        setBusy(false)
       })
 
     setBusy(true)
@@ -83,7 +95,9 @@ const Room: React.FC<Props> = ({
 
 const RoomQuery = RoomQueryContainer(({ room, ...rest }) => (
   room
-  ? <Room room={room} {...rest} />
+  ? room.gameActive
+    ? <RoomIsActive room={room} />
+    : <Room room={room} {...rest} />
   : <Redirect to="/" />
 ))
 

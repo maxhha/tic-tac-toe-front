@@ -39,6 +39,10 @@ const Menu: React.FC<{
         setBusy(false)
         update()
       })
+      .catch(error => {
+        console.error(error)
+        setBusy(false)
+      })
   }
   return (
     <Page>

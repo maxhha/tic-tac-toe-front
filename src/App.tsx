@@ -3,8 +3,6 @@ import {
   HashRouter as Router,
 } from "react-router-dom"
 
-import Return from "pages/Return"
-
 import Main from "pages"
 
 import { ViewerContextProvider } from "contexts/viewer"

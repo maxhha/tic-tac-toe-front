@@ -43,6 +43,10 @@ const Main: React.FC<RouteComponentProps> = ({
         history.push("/"+roomId)
         updateUser()
       })
+      .catch(error => {
+        console.error(error)
+        setBusy(false)
+      })
 
     setBusy(true)
   }
@@ -53,6 +57,7 @@ const Main: React.FC<RouteComponentProps> = ({
   return (
     <Page>
       <LoginForm>
+        <Heading.h2>Create new room</Heading.h2>
         <Input placeholder="Room name" ref = { roomName } />
         <Button onClick={ handleClick } disabled = { busy } > Create room </Button>
       </LoginForm>

@@ -2,13 +2,10 @@ import React from "react"
 import {
   withRouter,
   RouteComponentProps,
-  Redirect,
 } from "react-router-dom"
 
+import commitEnterRoomMutation from "mutations/enterRoom"
 import ViewerContext from "contexts/viewer"
-
-import Wait from "./Wait"
-import Menu from "./Menu"
 
 import {
   Page,
@@ -25,7 +22,7 @@ const NotFound: React.FC = () => (
   </Page>
 )
 
-const RoomIsActive: React.FC<{room: IRoom}> = ({ room }) => (
+const RoomIsActive: React.FC<{ room: IRoom }> = ({ room }) => (
   <Page>
     <Heading.h2>
       Game in room "{room.name}" has already started
@@ -33,35 +30,28 @@ const RoomIsActive: React.FC<{room: IRoom}> = ({ room }) => (
   </Page>
 )
 
-const Room: React.FC<{ room: IRoom }> = ({ room }) => {
-  const { viewer } = React.useContext(ViewerContext)
-  if (viewer === null) {
-    throw new Error("Viewer is null")
-  }
-  const { currentRoom } = viewer
-  if (currentRoom === null) {
-    throw new Error("Current room is null")
-  }
+const EnterRoom: React.FC<{ room: IRoom }> = ({ room }) => {
+  const { update } = React.useContext(ViewerContext)
 
-  return (
-    currentRoom.id === room.id
-    ? room.gameActive
-      ? <Redirect to="/game"/>
-      : <Wait />
-    : room.gameActive
-      ? <RoomIsActive room={room}/>
-      : (
-        <Menu
-          currentRoom={currentRoom}
-          targetRoom={room}
-        />
-      )
-  )
+  React.useEffect(() => {
+    commitEnterRoomMutation({
+      id: room.id,
+    })
+      .then(() => update())
+      .catch(error => console.error(error))
+  }, [
+    update,
+    room,
+  ])
+
+  return <>Please, wait...</>
 }
 
 const RoomQuery = RoomQueryContainer(({ room }) => (
   room
-  ? <Room room={room} />
+  ? room.gameActive
+    ? <RoomIsActive room={room}/>
+    : <EnterRoom room={room} />
   : <NotFound />
 ))
 

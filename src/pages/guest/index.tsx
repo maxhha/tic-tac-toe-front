@@ -10,13 +10,6 @@ import Room from "./Room"
 const Guest: React.FC = () => (
   <Switch>
     <Route exact path="/" component={Main} />
-    {/*
-    <Route path="/new" component={NewRoom} />
-    */}
-    {/*
-    <Route exact path="/return" component={Return} />
-    <Route path="/enter/:id" component={Return} />
-    */}
     <Route path="/:id" component={Room} />
   </Switch>
 )
