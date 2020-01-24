@@ -99,9 +99,8 @@ const Room: React.FC<{ room: IRoom }> = ({ room }) => {
   } else if (viewer.currentRoom.id === room.id) {
     return room.gameActive ? <Redirect to="/game"/> : <Wait />
   } else {
-
+    return <>Enter room menu</>
   }
-  return null
 }
 
 const RoomQuery = RoomQueryContainer(({ room }) => (
