@@ -27,7 +27,6 @@ import {
 } from "./utils"
 
 import BoardView from "./BoardView"
-import UserExited from "./UserExited"
 
 import {
   ControlButton,
@@ -86,7 +85,6 @@ interface GameBoardProps {
   board: Board,
   viewer: Viewer,
   onUserExit(e: { user: UserWithName }): void,
-  onGameEnd(): void,
 }
 
 interface GameBoardState {
@@ -94,7 +92,6 @@ interface GameBoardState {
   selected: Position | null,
   busy: boolean,
   view: View,
-  // exited?: UserWithName,
 }
 
 export const GameBoard: React.FC<GameBoardProps> = (props) => {
@@ -139,6 +136,10 @@ export const GameBoard: React.FC<GameBoardProps> = (props) => {
     return dispose
   }, [props.board])
 
+  const {
+    onUserExit
+  } = props
+
   React.useEffect(() => {
     const { dispose } = requestSubscription({
       subscription: userExitSubscription,
@@ -149,16 +150,14 @@ export const GameBoard: React.FC<GameBoardProps> = (props) => {
       }) => {
         if (userExit) {
           console.log(`Oh no ${userExit.name} exited room :(`)
-          props.onUserExit({ user: userExit })
-          // setState((state) => ({
-          //   ...state,
-          //   exited: userExit,
-          // }))
+          onUserExit({ user: userExit })
         }
       },
     })
     return dispose
-  }, [])
+  }, [
+    onUserExit,
+  ])
 
   const makeStep = (position: Position) => {
     setState({...state, busy: true})
@@ -208,10 +207,6 @@ export const GameBoard: React.FC<GameBoardProps> = (props) => {
     state.board.order,
     state.view.symbols,
   ])
-
-  // if (state.exited) {
-  //   return <UserExited user={state.exited} viewer={props.viewer} />
-  // }
 
   return (
     <>

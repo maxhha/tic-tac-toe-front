@@ -20,6 +20,8 @@ import {
   Page,
 } from "styles"
 
+import UserExited from "./UserExited"
+
 const query = graphql`
   query GameQuery {
     board {
@@ -73,7 +75,6 @@ const query = graphql`
 
 const GameQuery: React.FC<{
   onUserExit(e: { user: UserWithName }):void,
-  onGameEnd():void,
 }> = (props) => (
   <QueryRenderer
     query={query}
@@ -99,13 +100,22 @@ const GameQuery: React.FC<{
   />
 )
 
-const GamePage: React.FC = () => (
-  <Page>
-    <GameQuery
-      onUserExit={({ user }) => console.log(`${user.name} exited`)}
-      onGameEnd={() => console.log("game end")}
-    />
-  </Page>
-)
+const GamePage: React.FC = () => {
+  const [exited, setExited] = React.useState<{ user: UserWithName } | null>(null)
+
+  return (
+    <Page>
+      {
+        exited
+        ? <UserExited {...exited}/>
+        : (
+          <GameQuery
+            onUserExit={setExited}
+          />
+        )
+      }
+    </Page>
+  )
+}
 
 export default GamePage
