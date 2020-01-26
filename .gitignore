@@ -20,7 +20,6 @@
 .env.production.local
 
 **/__*__
-schema/
 
 npm-debug.log*
 yarn-debug.log*

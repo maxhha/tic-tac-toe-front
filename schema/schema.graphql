@@ -1,0 +1,69 @@
+type Board {
+  cells: [Cell]!
+  possibleSteps: [Position]!
+  lastStep: Cell!
+  winner: User
+  winnerLine: [Position]
+  currentPlayer: User
+  order: [User]!
+}
+
+type Cell {
+  position: Position!
+  owner: User!
+}
+
+input createUserInput {
+  name: String!
+}
+
+input makeStepInput {
+  x: Int!
+  y: Int!
+}
+
+type Mutation {
+  makeStep(input: makeStepInput!): Board
+  push(data: String!): Int
+  createRoom(name: String!): Room!
+  enterRoom(id: ID!): Room
+  exitRoom: Boolean
+  setReady(ready: Boolean!): Room
+  createUser(input: createUserInput!): Token!
+}
+
+type Position {
+  x: Int!
+  y: Int!
+}
+
+type Query {
+  board: Board
+  hello: String
+  test(name: String!): String
+  age: String
+  getRoom(id: ID!): Room
+  viewer: User
+}
+
+type Room {
+  id: ID!
+  name: String!
+  users: [User]!
+  gameActive: Boolean!
+}
+
+type Subscription {
+  waitBoardChange: Board
+  dataAdded(name: String!): String
+  waitForOtherUser: Room
+  userExit: User
+}
+
+scalar Token
+
+type User {
+  id: ID!
+  name: String!
+  currentRoom: Room
+}
